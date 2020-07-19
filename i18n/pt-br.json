@@ -2,5 +2,12 @@
 	"@metadata": {
 		"authors": ["Murilo Ricci"]
 	},
-	"tibiahighscores-desc": "Fornece tabela com detalhes dos jogadores com níveis mais altos em Tibia"
+	"tibiahighscores-desc": "Fornece tabela com detalhes dos jogadores com níveis mais altos em Tibia",
+	"tibiahighscores-name": "Nome",
+	"tibiahighscores-vocation": "Vocação",
+	"tibiahighscores-level": "Level",
+	"tibiahighscores-guild": "Guilda",
+	"tibiahighscores-error-world": "Mundo inexistente.",
+	"tibiahighscores-error-vocation": "Vocação inválida.",
+	"tibiahighscores-error-amount": "Quantidade precisa ser um valor numérico positivo."
 }
