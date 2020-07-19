@@ -1,0 +1,31 @@
+{
+	"name": "TibiaHighscores",
+	"version": "1.0.0",
+	"author": [
+		"Murilo Ricci"
+	],
+	"url": "",
+	"descriptionmsg": "tibiahighscores-desc",
+	"license-name": "GPL-3.0",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.31.0"
+	},
+	"AutoloadClasses": {
+		"MediaWiki\\Extension\\TibiaHighscores\\Hooks": "src/Hooks.php"
+	},
+	"ExtensionMessagesFiles": {
+		"TibiaHighscoresAlias": "TibiaHighscores.i18n.alias.php"
+	},
+	"Hooks": {
+		"ParserFirstCallInit": [
+			"MediaWiki\\Extension\\TibiaHighscores\\Hooks::onParserFirstCallInit"
+		]
+	},
+	"MessagesDirs": {
+		"TibiaHighscores": [
+			"i18n"
+		]
+	},
+	"manifest_version": 2
+}
