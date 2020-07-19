@@ -58,7 +58,7 @@ class Hooks {
 				if (array_key_exists('guild', $characters)) {
 					$guildName = '[https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=' . str_replace(' ', '+', $characters['guild']['name']) . ' ' . $characters['guild']['name'] . ']';
 				}
-				$table .= '<tr><td>' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td>' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
+				$table .= '<tr><td style="width: 50px text-align: center;">' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td style="text-align: center;">' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
 			}
 			$table .= '</table>';
 			return $table;
