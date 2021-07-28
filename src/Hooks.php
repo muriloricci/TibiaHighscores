@@ -50,15 +50,17 @@ class Hooks {
 			$highscores = $data['highscores']['data'];
 			$table = '<table class="wikitable"><tr><th></th><th>' . wfMessage('tibiahighscores-name')->text() . '</th><th>' . wfMessage('tibiahighscores-vocation')->text() . '</th><th>' . wfMessage('tibiahighscores-level')->text() . '</th><th>' . wfMessage('tibiahighscores-guild')->text() . '</th></tr>';
 			for ($i = 0;$i < intval($amount);$i++) {
-				$urlCharacter = 'https://api.tibiadata.com/v2/characters/' . str_replace(' ', '+', $highscores[$i]['name']) . '.json';
-				$json2 = file_get_contents($urlCharacter);
-				$data2 = json_decode($json2, true);
-				$characters = $data2['characters']['data'];
-				$guildName = '';
-				if (array_key_exists('guild', $characters)) {
-					$guildName = '[https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=' . str_replace(' ', '+', $characters['guild']['name']) . ' ' . $characters['guild']['name'] . ']';
+				if ( !empty($highscores[$i]['name']) ) {
+					$urlCharacter = 'https://api.tibiadata.com/v2/characters/' . str_replace(' ', '+', $highscores[$i]['name']) . '.json';
+					$json2 = file_get_contents($urlCharacter);
+					$data2 = json_decode($json2, true);
+					$characters = $data2['characters']['data'];
+					$guildName = '';
+					if (array_key_exists('guild', $characters)) {
+						$guildName = '[https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=' . str_replace(' ', '+', $characters['guild']['name']) . ' ' . $characters['guild']['name'] . ']';
+					}
+					$table .= '<tr><td style="width: 50px text-align: center;">' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td style="text-align: center;">' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
 				}
-				$table .= '<tr><td style="width: 50px text-align: center;">' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td style="text-align: center;">' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
 			}
 			$table .= '</table>';
 			return $table;
