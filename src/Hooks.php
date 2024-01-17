@@ -17,54 +17,65 @@ class Hooks {
 				[Hooks::class, 'callBack']
 			);
 	}
-	
-	public static function callBack( \Parser $parser, $world = 'All', $vocation = '', $amount = '25' ) {
+
+	public static function callBack( \Parser $parser, $world = 'all', $vocation = 'all', $amount = '25' ) {
 		if (empty($world)) {
-			$world = 'All';			
+			$world = 'all';
 		}
-		$worlds = ["All", "Antica", "Assombra", "Astera", "Belluma", "Belobra", "Bona", "Calmera", "Carnera", "Celebra", "Celesta", "Concorda", "Cosera", "Damora", "Descubra", "Dibra", "Duna", "Emera", "Epoca", "Estela", "Faluna", "Ferobra", "Firmera", "Funera", "Furia", "Garnera", "Gentebra", "Gladera", "Harmonia", "Helera", "Honbra", "Impera", "Inabra", "Javibra", "Jonera", "Kalibra", "Kenora", "Libertabra", "Lobera", "Luminera", "Lutabra", "Macabra", "Menera", "Mitigera", "Monza", "Nefera", "Noctera", "Nossobra", "Olera", "Ombra", "Pacera", "Pacembra", "Peloria", "Premia", "Pyra", "Quelibra", "Quintera", "Ragna", "Refugia", "Relania", "Relembra", "Secura", "Serdebra", "Serenebra", "Solidera", "Talera", "Torpera", "Tortura", "Unica", "Venebra", "Vita", "Vunira", "Wintera", "Xandebra", "Xylona", "Yonabra", "Ysolera", "Zenobra", "Zuna", "Zunera"];
+		$worlds = ["all", "Ambra", "Antica", "Astera", "Axera", "Belobra", "Bombra", "Bona", "Calmera", "Castela", "Celebra", "Celesta", "Collabra", "Damora", "Descubra", "Dia", "Epoca", "Esmera", "Etebra", "Ferobra", "Firmera", "Flamera", "Gentebra", "Gladera", "Gravitera", "Guerribra", "Harmonia", "Havera", "Honbra", "Impulsa", "Inabra", "Issobra", "Jacabra", "Jadebra", "Jaguna", "Kalibra", "Kardera", "Kendria", "Lobera", "Luminera", "Lutabra", "Menera", "Monza", "Mykera", "Nadora", "Nefera", "Nevia", "Obscubra", "Ombra", "Ousabra", "Pacera", "Peloria", "Premia", "Pulsera", "Quelibra", "Quintera", "Rasteibra", "Refugia", "Retalia", "Runera", "Secura", "Serdebra", "Solidera", "Syrena", "Talera", "Thyria", "Tornabra", "Ustebra", "Utobra", "Venebra", "Vitera", "Vunira", "Wadira", "Wildera", "Wintera", "Yonabra", "Yovera", "Zuna", "Zunera"];
 		if (!in_array($world, $worlds)) {
 			return '<div class="error">' . wfMessage('tibiahighscores-error-world')->text() . '</div>';
 		}
 		if (empty($vocation)) {
-			$vocation = 'any';
+			$vocation = 'all';
 		}
-		$vocations= ["any", "none", "druid", "knight", "paladin", "sorcerer"];
+		$vocations= ["all", "none", "druid", "knight", "paladin", "sorcerer"];
 		if (!in_array($vocation, $vocations)) {
 			return '<div class="error">' . wfMessage('tibiahighscores-error-vocation')->text() . '</div>';
 		}
 		$vocationAddon = '';
-		if ($vocation != 'any') {
+		if ($vocation != 'all') {
 			$vocationAddon = '/' . $vocation;
 		}
 		if ( !is_numeric( $amount ) || intval( $amount ) <= 0 ) {
 			return '<div class="error">' . wfMessage('tibiahighscores-error-amount')->text() . '</div>';
 		}
-		
+
 		$cache = \ObjectCache::getInstance( CACHE_ANYTHING );
 
-		$content = $cache->getWithSetCallback( $cache->makeKey( 'tibiahighscores', $world, $vocation, $amount ), $cache::TTL_HOUR, function() use ( $world, $vocation, $vocationAddon, $amount ) {
-			$url = 'https://api.tibiadata.com/v2/highscores/' . $world . '/experience' . $vocationAddon . '.json';
-			$json = file_get_contents($url);
-			$data = json_decode($json, true);
-			$highscores = $data['highscores']['data'];
-			$table = '<table class="wikitable"><tr><th></th><th>' . wfMessage('tibiahighscores-name')->text() . '</th><th>' . wfMessage('tibiahighscores-vocation')->text() . '</th><th>' . wfMessage('tibiahighscores-level')->text() . '</th><th>' . wfMessage('tibiahighscores-guild')->text() . '</th></tr>';
-			for ($i = 0;$i < intval($amount);$i++) {
-				if ( !empty($highscores[$i]['name']) ) {
-					$urlCharacter = 'https://api.tibiadata.com/v2/characters/' . str_replace(' ', '+', $highscores[$i]['name']) . '.json';
-					$json2 = file_get_contents($urlCharacter);
-					$data2 = json_decode($json2, true);
-					$characters = $data2['characters']['data'];
-					$guildName = '';
-					if (array_key_exists('guild', $characters)) {
-						$guildName = '[https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=' . str_replace(' ', '+', $characters['guild']['name']) . ' ' . $characters['guild']['name'] . ']';
+		$content = $cache->getWithSetCallback( 
+			$cache->makeKey( 'tibiahighscores', $world, $vocation, $amount ),
+			$cache::TTL_HOUR,
+			function() use ( $world, $vocation, $vocationAddon, $amount ) {
+				// Disable SSL validation while the servers don't get newer CA bundles
+				$arrContextOptions=array(
+					"ssl"=>array(
+						"verify_peer"=>false,
+						"verify_peer_name"=>false,
+					),
+				);
+				$url = 'https://api.tibiadata.com/v4/highscores/' . $world . '/experience' . $vocationAddon;
+				$json = file_get_contents($url, false, stream_context_create($arrContextOptions));
+				$data = json_decode($json, true);
+				$highscores = $data['highscores']['highscore_list'];
+				$table = '<table class="wikitable"><tr><th></th><th>' . wfMessage('tibiahighscores-name')->text() . '</th><th>' . wfMessage('tibiahighscores-vocation')->text() . '</th><th>' . wfMessage('tibiahighscores-level')->text() . '</th><th>' . wfMessage('tibiahighscores-guild')->text() . '</th></tr>';
+				for ($i = 0;$i < intval($amount);$i++) {
+					if ( !empty($highscores[$i]['name']) ) {
+						$urlCharacter = 'https://api.tibiadata.com/v4/character/' . str_replace(' ', '+', $highscores[$i]['name'])	;
+						$json2 = file_get_contents($urlCharacter, false, stream_context_create($arrContextOptions));
+						$data2 = json_decode($json2, true);
+						$characters = $data2['character']['character'];
+						$guildName = '';
+						if ($characters && array_key_exists('guild', $characters) && $characters['guild']['name'] != null && $characters['guild']['name'] != "") {
+							$guildName = '[https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=' . str_replace(' ', '+', $characters['guild']['name']) . ' ' . $characters['guild']['name'] . ']';
+						}
+						$table .= '<tr><td style="width: 50px text-align: center;">' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td style="text-align: center;">' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
 					}
-					$table .= '<tr><td style="width: 50px text-align: center;">' . $highscores[$i]['rank'] . '</td><td>[https://www.tibia.com/community/?subtopic=characters&name=' . str_replace(' ', '+', $highscores[$i]['name']) . ' ' . $highscores[$i]['name'] . ']</td><td>' . $highscores[$i]['vocation'] . '</td><td style="text-align: center;">' . $highscores[$i]['level'] . '</td><td>' . $guildName . '</td></tr>';
 				}
+				$table .= '</table>';
+				return $table;
 			}
-			$table .= '</table>';
-			return $table;
-		}, [ 'pcTTL' => $cache::TTL_HOUR ] );
+		);
 		return $content;
 	}
 
